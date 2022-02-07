@@ -75,7 +75,6 @@ header = dbc.Navbar(
 card_map2 = dbc.Card(
     dbc.CardBody([
         html.H4("Porcentaje de Desnutrición por departamento"),
-        html.Hr(id="hr_1"),
         html.Div(
             dcc.Graph(
                 id='colombia_plot_2',
@@ -90,7 +89,6 @@ card_graph_distribution = dbc.Card(
         dbc.Card([
             dbc.CardBody([
                 html.H4("Porcentaje de desnutrición por año", className="card-title"),
-                html.Hr(id="hr_1"),
                 dcc.Graph(
                     id='years_dist_plot',
                     figure=fig_years_dist
@@ -131,5 +129,4 @@ app.layout = html.Div([
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False, host="0.0.0.0", port=8080) # To make it public on the Internet
-    #app.run_server(debug=True, port=8080) # To test locally
+    app.run_server(debug=False, host="0.0.0.0", port=8080) 

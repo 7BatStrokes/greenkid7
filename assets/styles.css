@@ -209,7 +209,7 @@ body{
 }
 
 .hr_1{
-	borderWidth: 0.1vh;
+	border-width: 0.1vh;
 	width: 100%;
 	color: #DADADA;
 }
