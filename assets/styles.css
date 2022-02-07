@@ -48,7 +48,7 @@ body{
 .nav-bar__fix{
     top: 0;
     position: fixed;
-    width: 87%;
+    width: 100%;
     z-index: 1;
 }
 
