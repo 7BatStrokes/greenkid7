@@ -28,11 +28,7 @@ from app import app
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-
-with urlopen('https://kidnutrilytics3.blob.core.windows.net/blob3/Modelo_relapse_subset.sav') as response:
-    Modelo_relapse_subset = joblib.load(response)
-
-with urlopen('https://kidnutrilytics3.blob.core.windows.net/blob3/Modelo_malnutrition_subset.sav') as response:
+with urlopen('https://greenkid7.blob.core.windows.net/blobgreenkid7/Modelo_malnutrition_subset.sav') as response:
     Modelo_malnutrition_subset = joblib.load(response)
 
 
@@ -120,14 +116,35 @@ colombian_maps = dbc.Card([
     dbc.CardBody([
         dbc.Row([
             dbc.Col(
-                card_map2, width = 4
+                card_map2, width = 5
             ),
             dbc.Col(
-                card_graph_distribution, width = 6
+                card_graph_distribution, width = 7
             )
         ])
     ])
 ],color="light", outline=True)
+
+
+# Dropdown to select the model
+drop_model = dbc.FormGroup(
+    [
+        #html.
+        dbc.Label("Model", html_for="model", className="label_selector", width=3),
+        dbc.Col([
+            dcc.Dropdown(
+                id="model",
+                options=[{'value': 0, 'label': "Desnutrición"}],
+                value=0,
+                #className="container-fluid"
+            ),
+        ], width=9, align="center"),#className="lg-auto",),
+    ],
+    row=True,
+    #inline=True,
+    className="ml-0 mr-0",
+)
+
 
 # Dropdown child-care
 drop_child_care = dbc.FormGroup(
@@ -283,6 +300,7 @@ switches = dbc.Row([
 # Section where the user type the variables' values
 selectors = html.Div([
                 html.H5("Selecione todos los parámetros que apliquen", className="card-title"),
+                drop_model,
                 #dbc.Row([
                     #dbc.Col([
                         #dbc.Form([           
@@ -290,7 +308,6 @@ selectors = html.Div([
                         #],),#inline=True),
                     #]),
                 #]),
-                
                 slider_min_z,
                 dbc.Row(
                 [
@@ -323,7 +340,7 @@ selectors = html.Div([
 exp_prob = dcc.Markdown('''
 ---
 >
-> '¿Cómo interpretar la probilidad?'.
+> ¿Cómo interpretar la probabilidad?.
 > 
 ''')  
 
@@ -397,7 +414,64 @@ prediction_cards = dbc.Card(
                     ],)
                 ])
             )
+text_short_SHAP_1 = ("What you see on the left side is a waterfall plot to visualize "
+"SHAP values for each model feature. Feature values in", html.Span(" pink ", className="pink_bold"),
+"cause an increase in the "
+"final prediction (malnutrition/relapse probability). In contrast, feature "
+"values in" , html.Span(" blue ", className="blue_bold"), "cause a decrease in the final prediction. Size of the bar shows the "
+"magnitude of the feature's effect. A larger bar means that the corresponding feature "
+"has larger impact. The sum of all feature SHAP values explains why model prediction "
+"was different from the baseline.")
 
+
+#f"Model predicted {prob:.3f}
+text_short_SHAP_2 = ("Model predicted a probability of ",
+html.Span(children=[],id="prob-span", className="pink_bold"),
+" of suffering ", html.Span(children=[],id="model-span", className="pink_bold"),
+", whereas the base_value is 0.5. ", html.P(id="msg-least",children=[]), html.P(id="msg-great",children=[]))
+
+description_short_SHAP = dbc.Alert(
+            [   
+                html.P(text_short_SHAP_1),
+                html.P(text_short_SHAP_2),
+                #html.A("example link", href="#", className="alert-link"),
+                #html.B(red, style:"red")
+            ],
+            color="dark", className="text-justify p-4",
+        )
+
+
+
+# Bottom-section of the page - SHAP values visualization and their interpretation  
+Shap_cards = dbc.Card(
+                dbc.CardBody(
+                [
+                    dbc.Row([
+                        dbc.Col([
+                            dbc.Card([
+                                dbc.CardBody(
+                                        html.H3("SHAP values summary", className="card-title text-center"),
+                                        #html.Img(src=img, height="275px"),
+                                ),
+                                dbc.CardImg(id="shap_img", bottom=True), #, src=""
+                                #html.Img(id="shap_img",src=""),
+                            ], color="primary", outline=True),
+                        ],width=8),
+                        dbc.Col([
+                            dbc.Card(
+                                dbc.CardBody(
+                                    [
+                                        html.H3("Interpretation of the SHAP values", className="card-title"),
+                                        #html.P(description_short_SHAP,className="text-justify"),
+                                        description_short_SHAP,
+                                    ]
+                                ), color="primary", outline=True, 
+                            ),
+                        ],width=4),
+                    ]),
+                ],
+            )
+        )
 
 layout = dbc.Container([
     dbc.Row(dbc.Col(colombian_maps, width=12), className="mb-4",),
@@ -415,10 +489,14 @@ app.layout = html.Div([
 
 
 @app.callback(
-    [
+    [Output(component_id = "shap_img", component_property = "src"),
+    Output(component_id = "prob-span", component_property = "children"),
+    Output(component_id = "model-span", component_property = "children"),
     Output(component_id = "prog-bar", component_property = "children"),
     Output(component_id = "prog-bar", component_property = "value"),
     Output(component_id = "prog-bar", component_property = "color"),
+    Output(component_id = "msg-least", component_property = "children"),
+    Output(component_id = "msg-great", component_property = "children"),
     ],
     [Input(component_id = "button_pred", component_property = "n_clicks"),
     ],
@@ -432,7 +510,7 @@ app.layout = html.Div([
     State(component_id = "switches", component_property = "value"),
     ]
 )
-def on_button_click(n, care, min_z, max_z, avg_z, under, over, switch_list):
+def on_button_click(n, model_val, care, min_z, max_z, avg_z, under, over, switch_list):
     """
     print(f"button-n_clicks are: {n}, and type: {type(n)}")
     print(f"value model is: {model_val}, and type: {type(model_val)}")
@@ -463,11 +541,12 @@ def on_button_click(n, care, min_z, max_z, avg_z, under, over, switch_list):
         # Turning the feature dict in a pd.dataframe
         base_variables = PredictMini.convertirDicEnBase(valores)
 
-
-        img, shap_values = PredictMini.plotShapValues(Modelo_malnutrition_subset,base_variables)
-        str_modelo =  "malnutrition"
-        ranges = [0.34, 0.46, 0.59]
-        
+        # Parameter tuning according the selected model
+        if model_val == 0:
+            img, shap_values = PredictMini.plotShapValues(Modelo_malnutrition_subset,base_variables)
+            str_modelo =  "malnutrition"
+            ranges = [0.34, 0.46, 0.59]
+            print("Malnutrition")
         
         # Prob. predicted for the model
         shap_vals = shap_values[1][0]
@@ -483,8 +562,27 @@ def on_button_click(n, care, min_z, max_z, avg_z, under, over, switch_list):
         elif prob <= 1:
             color_bar = "#f30404" #alt. danger
         
-    
-        return (img, f"{prob:.3f}", str_modelo, f"{prob*100:.0f}%", f"{prob*100:.0f}", color_bar)
+        # print(type(shap_values[1][0]))
+        
+        
+        var_least, var_great = PredictMini.greatest_least(shap_vals)
+
+        msg_least = ""
+        msg_greatest = ""
+
+        if var_least != "":
+            msg_least = ("The variable ", html.Span(var_least,className="blue_bold"), " was the one with ",
+            "the greatest effect in ", html.Span("reducing", className="blue_bold"), " the risk of suffering ",
+            html.Span(str_modelo, className="pink_bold"), ". ")
+
+
+        if var_great != "":
+            msg_greatest = ("The variable ", html.Span(var_great, className="pink_bold"), " was the one with ",
+            "the greatest effect in ", html.Span("increasing", className="pink_bold"), " the risk of suffering ",
+            html.Span(str_modelo, className="pink_bold"), ".")
+
+        return (img, f"{prob:.3f}", str_modelo, f"{prob*100:.0f}%", f"{prob*100:.0f}", color_bar, msg_least, msg_greatest)
+
 
 
 
