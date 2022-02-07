@@ -487,12 +487,14 @@ app.layout = html.Div([
 
 
 @app.callback(
-    [
+    [Output(component_id = "shap_img", component_property = "src"),
     Output(component_id = "prob-span", component_property = "children"),
     Output(component_id = "model-span", component_property = "children"),
     Output(component_id = "prog-bar", component_property = "children"),
     Output(component_id = "prog-bar", component_property = "value"),
     Output(component_id = "prog-bar", component_property = "color"),
+    Output(component_id = "msg-least", component_property = "children"),
+    Output(component_id = "msg-great", component_property = "children"),
     ],
     [Input(component_id = "button_pred", component_property = "n_clicks"),
     ],
@@ -537,19 +539,15 @@ def on_button_click(n, model_val, care, min_z, max_z, avg_z, under, over, switch
         # Turning the feature dict in a pd.dataframe
         base_variables = PredictMini.convertirDicEnBase(valores)
 
-        # Parameter tuning according the selected model
-        #if model_val == 0:
-        #    img, shap_values = PredictMini.plotShapValues(Modelo_malnutrition_subset,base_variables)
-        #    
-        #    
-        #    print("Malnutrition")
+        img, shap_values = PredictMini.plotShapValues(Modelo_malnutrition_subset,base_variables)
+        str_modelo =  "malnutrition"
+        ranges = [0.34, 0.46, 0.59]
+        print("Malnutrition")
         
         # Prob. predicted for the model
-        #shap_vals = shap_values[1][0]
-        #prob = 0.5 + shap_vals.sum()
-        str_modelo =  "Desnutrición"
-        ranges = [0.34, 0.46, 0.59]
-        prob = PredictMini.obtenerProbabilidad(Modelo_malnutrition_subset,base_variables)
+        shap_vals = shap_values[1][0]
+        prob = 0.5 + shap_vals.sum()
+
         # Bar color selection
         if prob <= ranges[0]:
             color_bar = "#1fbd38" #alt. success
@@ -563,9 +561,26 @@ def on_button_click(n, model_val, care, min_z, max_z, avg_z, under, over, switch
         # print(type(shap_values[1][0]))
         
         
-        #var_least, var_great = PredictMini.greatest_least(shap_vals)
+        var_least, var_great = PredictMini.greatest_least(shap_vals)
 
-        return (f"{prob:.3f}", str_modelo, f"{prob*100:.0f}%", f"{prob*100:.0f}", color_bar)
+        msg_least = ""
+        msg_great = ""
+
+        if var_least != "":
+            msg_least = ("The variable ", html.Span(var_least,className="blue_bold"), " was the one with ",
+            "the greatest effect in ", html.Span("reducing", className="blue_bold"), " the risk of suffering ",
+            html.Span(str_modelo, className="pink_bold"), ". ")
+
+
+        if var_great != "":
+            msg_great = ("The variable ", html.Span(var_great, className="pink_bold"), " was the one with ",
+            "the greatest effect in ", html.Span("increasing", className="pink_bold"), " the risk of suffering ",
+            html.Span(str_modelo, className="pink_bold"), ".")
+
+
+        return (img, f"{prob:.3f}", str_modelo, f"{prob*100:.0f}%", f"{prob*100:.0f}", color_bar, msg_least, msg_great)
+
+
 
 
 
