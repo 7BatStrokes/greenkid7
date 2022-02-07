@@ -124,6 +124,13 @@ colombian_maps = dbc.Card([
 ],color="light", outline=True)
 
 
+# List of child care categories
+child_care_opt = ["Attends a community place, kindergarten, child development center or school.",
+"With his or her parent at home", "With parent at work", "With maid or nanny at home",
+"In the care of a relative 18 years of age or older", "In the care of a relative under 18 years of age",
+"At home alone","Not applicable by flow"]
+
+
 # Dropdown to select the model
 drop_model = dbc.FormGroup(
     [
@@ -132,7 +139,7 @@ drop_model = dbc.FormGroup(
         dbc.Col([
             dcc.Dropdown(
                 id="model",
-                options=[{'value': 0, 'label': "Desnutrición"}],
+                options=[{'value': 0, 'label': "Malnutrition"}, {'value': 1, 'label': "Relapse"}],
                 value=0,
                 #className="container-fluid"
             ),
@@ -143,12 +150,11 @@ drop_model = dbc.FormGroup(
     className="ml-0 mr-0",
 )
 
-
 # Dropdown child-care
 drop_child_care = dbc.FormGroup(
     [
         #html.
-        dbc.Label("Tipo de cuidado del niño", html_for="ch_care", className="label_selector", width=3),
+        dbc.Label("Children care type", html_for="ch_care", className="label_selector", width=3),
         dbc.Col([
             dcc.Dropdown(
                 id="ch_care",
@@ -168,7 +174,7 @@ drop_child_care = dbc.FormGroup(
 step = 1
 slider_min_z = dbc.FormGroup(
     [
-        dbc.Label("Mín. Z-score peso-altura:", html_for="slider-min-z",
+        dbc.Label("Min. Z-score weight-height:", html_for="slider-min-z",
              width=4, className="label_selector" , align="center"),
         dbc.Col(
             dcc.Slider(
@@ -189,7 +195,7 @@ slider_min_z = dbc.FormGroup(
 
 slider_max_z = dbc.FormGroup(
     [
-        dbc.Label("Máx. Z-score peso-altura:", html_for="slider-max-z",
+        dbc.Label("Max. Z-score weight-height:", html_for="slider-max-z",
              width=12, className="label_selector" , align="center"),
         dbc.Col(
             dcc.Slider(
@@ -209,7 +215,7 @@ slider_max_z = dbc.FormGroup(
 
 slider_avg_z = dbc.FormGroup(
     [
-        dbc.Label("Promedio Z-score peso-altura:", html_for="slider-avg-z",
+        dbc.Label("Avg. Z-score weight-height:", html_for="slider-avg-z",
              width=12, className="label_selector" , align="center"),
         dbc.Col(
             dcc.Slider(
@@ -230,7 +236,7 @@ slider_avg_z = dbc.FormGroup(
 
 slider_under = dbc.FormGroup(
     [
-        dbc.Label("No. de veces en desnutrición:", html_for="slider-under",
+        dbc.Label("Undernutrition times:", html_for="slider-under",
              width=12, className="label_selector" , align="center"),
         dbc.Col(
             dcc.Slider(
@@ -250,7 +256,7 @@ slider_under = dbc.FormGroup(
 
 slider_over = dbc.FormGroup(
     [
-        dbc.Label("No. de veces en sobrepeso:", html_for="slider-over",
+        dbc.Label("Overweight times:", html_for="slider-over",
              width=12, className="label_selector" , align="center"),
         dbc.Col(
             dcc.Slider(
@@ -276,10 +282,10 @@ switches = dbc.Row([
                         hidden=True, width=12, align="center"),
                     dbc.Checklist(
                         options=[
-                            {"label": "Discapacidad", "value": 1},
-                            {"label": "Alfabetizado", "value": 2},
-                            {"label": "Estudia", "value": 3},
-                            {"label": "Recibe Comida", "value": 4},
+                            {"label": "Disability", "value": 1},
+                            {"label": "Literate", "value": 2},
+                            {"label": "Study", "value": 3},
+                            {"label": "Receives food", "value": 4},
                         ],
                         value=[1],
                         id="switches",
@@ -297,8 +303,16 @@ switches = dbc.Row([
 
 # Section where the user type the variables' values
 selectors = html.Div([
-                html.H5("Selecione todos los parámetros que apliquen", className="card-title"),
+                html.H5("Select all parameters that apply", className="card-title"),
+                dbc.Alert(["If you select ",
+                             html.Em("\"Relapse\""),
+                            " model, we assume that the child already had malnutrition."], color="success"),
                 drop_model,
+                html.P(
+                    "Answer the following 10 questions with respect "
+                    "to the past 12 months.",
+                    className="card-text",
+                ),
                 #dbc.Row([
                     #dbc.Col([
                         #dbc.Form([           
@@ -306,6 +320,8 @@ selectors = html.Div([
                         #],),#inline=True),
                     #]),
                 #]),
+                
+                
                 slider_min_z,
                 dbc.Row(
                 [
@@ -330,6 +346,11 @@ selectors = html.Div([
                 ],
                 form=True, align="start", className="mb-0",
                 ),
+
+                
+                
+                #dbc.Button("Click here", color="success", className="mt-auto"),
+
 ])
 
 
@@ -338,7 +359,7 @@ selectors = html.Div([
 exp_prob = dcc.Markdown('''
 ---
 >
-> ¿Cómo interpretar la probabilidad?.
+> How to read the probability?.
 > 
 ''')  
 
@@ -347,7 +368,7 @@ exp_prob = dcc.Markdown('''
 prediction_cards = dbc.Card(
             dbc.CardBody(
                 [
-                html.H1('Herramienta de predicción para niños individuales',className="card-title"),
+                html.H1('Prediction tool for individuals',className="card-title"),
                 dbc.Row([
                         dbc.Col([
                             dbc.Card(
@@ -370,11 +391,11 @@ prediction_cards = dbc.Card(
                                 dbc.CardBody(
                                     [
                                         
-                                        html.H5("Instrucciones", className="card-title"),
+                                        html.H5("Instructions", className="card-title"),
                                         #html.P(description_short_SHAP,className="text-justify"),
-                                        dbc.Alert(html.P(("Predicción de la probabilidad de que un niño sufra desnutrición "
-                                        "durante los próximos 6 meses. Por favor modifique los parámetros de la izquierda y luego presione ",
-                                        html.Em("\"Ejecutar Predictor\""), " para obtener la predicción."),className="text-justify"), color="success"),
+                                        dbc.Alert(html.P(("Prediction of the probability that a child suffers malnutrition or relapse "
+                                        "on it within the next 6 months. Please modify the parameters on the left and then press ",
+                                        html.Em("\"RUN PREDICTOR\""), " to obtain the prediction."),className="text-justify"), color="success"),
                                         #html.P(
                                             #"This card has some text content.",
                                             #className="card-text",
@@ -392,14 +413,14 @@ prediction_cards = dbc.Card(
                                         exp_prob,
                                         html.Div([
                                             html.Ul([
-                                                html.Li([html.Span("Riesgo Bajo: ", style={"color": "#1fbd38"}),
-                                                "El niño actualmente tiene bajo riesgo de padecer esta enfermedad."]),
-                                                html.Li([html.Span("Riesgo Leve: ", style={"color": "#fff000"}),
-                                                "El niño tiene un riesgo leve de padecer esta enfermedad."]),
-                                                html.Li([html.Span("Riesgo Latente: ", style={"color": "#f86e02"}),
-                                                "El niño tiene riesgo latente de sufrir esta enfermedad."]),
-                                                html.Li([html.Span("Alto Riesgo: ", style={"color": "#f30404"}),
-                                                "El niño debe ser priorizado."]),
+                                                html.Li([html.Span("Low risk: ", style={"color": "#1fbd38"}),
+                                                "The child is currently at low risk of suffering this disease."]),
+                                                html.Li([html.Span("Slight risk: ", style={"color": "#fff000"}),
+                                                "The child has slight risk of suffering this disease."]),
+                                                html.Li([html.Span("Latent risk: ", style={"color": "#f86e02"}),
+                                                "The child has latent risk of suffering this disease."]),
+                                                html.Li([html.Span("High risk: ", style={"color": "#f30404"}),
+                                                "The child should be prioritized."]),
                                             ]),
                                         ]),
                                         dbc.Progress(id="prog-bar", value="", color="",
@@ -412,6 +433,8 @@ prediction_cards = dbc.Card(
                     ],)
                 ])
             )
+
+
 text_short_SHAP_1 = ("What you see on the left side is a waterfall plot to visualize "
 "SHAP values for each model feature. Feature values in", html.Span(" pink ", className="pink_bold"),
 "cause an increase in the "
@@ -469,7 +492,9 @@ Shap_cards = dbc.Card(
                     ]),
                 ],
             )
-        )
+        )   
+
+
 
 layout = dbc.Container([
     dbc.Row(dbc.Col(colombian_maps, width=12), className="mb-4",),
@@ -539,10 +564,17 @@ def on_button_click(n, model_val, care, min_z, max_z, avg_z, under, over, switch
         # Turning the feature dict in a pd.dataframe
         base_variables = PredictMini.convertirDicEnBase(valores)
 
-        img, shap_values = PredictMini.plotShapValues(Modelo_malnutrition_subset,base_variables)
-        str_modelo =  "malnutrition"
-        ranges = [0.34, 0.46, 0.59]
-        print("Malnutrition")
+        # Parameter tuning according the selected model
+        if model_val == 0:
+            img, shap_values = PredictMini.plotShapValues(Modelo_malnutrition_subset,base_variables)
+            str_modelo =  "malnutrition"
+            ranges = [0.34, 0.46, 0.59]
+            print("Malnutrition")
+        if model_val == 1:
+            img, shap_values = PredictMini.plotShapValues(Modelo_malnutrition_subset,base_variables)
+            str_modelo =  "relapse"
+            ranges = [0.45, 0.55, 0.63]
+            print("Relapse")
         
         # Prob. predicted for the model
         shap_vals = shap_values[1][0]
@@ -564,7 +596,7 @@ def on_button_click(n, model_val, care, min_z, max_z, avg_z, under, over, switch
         var_least, var_great = PredictMini.greatest_least(shap_vals)
 
         msg_least = ""
-        msg_great = ""
+        msg_greatest = ""
 
         if var_least != "":
             msg_least = ("The variable ", html.Span(var_least,className="blue_bold"), " was the one with ",
@@ -579,7 +611,6 @@ def on_button_click(n, model_val, care, min_z, max_z, avg_z, under, over, switch
 
 
         return (img, f"{prob:.3f}", str_modelo, f"{prob*100:.0f}%", f"{prob*100:.0f}", color_bar, msg_least, msg_great)
-
 
 
 
