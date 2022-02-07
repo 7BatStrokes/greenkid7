@@ -502,7 +502,7 @@ layout = dbc.Container([
 ], fluid=True)
 
 app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),
+    dcc.Location(id='button_pred', refresh=False),
     html.Div([
         header,
         html.Div(id='page-content', children=layout, className='content')
@@ -547,6 +547,7 @@ def on_button_click(n, model_val, care, min_z, max_z, avg_z, under, over, switch
     """
     # Trigger: each time the user gives a click
     if n >= 0:
+
         # Building the feature vector
         valores = {"AVG_ZScorePesoTalla_12M": avg_z, #[-3,3] --> Slider float
            "MAX_ZScorePesoTalla_12M": max_z, #[-3,3] --> Slider float
@@ -611,10 +612,6 @@ def on_button_click(n, model_val, care, min_z, max_z, avg_z, under, over, switch
 
 
         return (img, f"{prob:.3f}", str_modelo, f"{prob*100:.0f}%", f"{prob*100:.0f}", color_bar, msg_least, msg_great)
-
-
-
-
 
 if __name__ == '__main__':
     app.run_server(debug=False, host="0.0.0.0", port=8080) 
