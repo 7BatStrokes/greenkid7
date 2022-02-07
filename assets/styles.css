@@ -1,0 +1,252 @@
+html {
+	height: 100%;
+}
+
+body{
+    background-color:#F2F4FD;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.rooter_container{
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.app_side_bar{
+    display: flex;
+    flex: 11;
+    padding: 2rem 1rem;
+    background:#0B3862;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+.app-container__header__content {
+    margin-top: 10px;
+    flex: 88;
+    overflow-y: scroll;
+}
+
+.app_header{
+    top: 0;
+    position: fixed;
+    width: 85%;
+    padding: 5px 5% 5px 5px;
+    background: #fff;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    box-shadow: 2px 2px 2px 1px #d2d5d6;
+}
+
+.nav-bar__fix{
+    top: 0;
+    position: fixed;
+    width: 87%;
+    z-index: 1;
+}
+
+.nav-bar__links{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin-top: 40%;
+    height: 20%;
+}
+
+.nav-bar__links a{
+    margin-top: 10px;
+}
+
+.nav-bar__links p{
+    margin-top: 20px;
+    color: #51CBFF;
+}
+
+.text-p{
+    margin-top: 20px;
+    color: #51CBFF;
+}
+
+.img_footer{
+    position: fixed;
+    bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.img_footer img{
+    margin: 10%;
+    max-width: 4rem;
+    max-height: 80%;
+}
+
+.content {
+    padding-top: 50px;
+    padding: 15px;
+    margin-top: 5%;
+    /*display: flex;*/
+}
+
+
+/*about us styles*/
+
+.about_us__foto{
+    height:250px;
+    display:block;
+    margin-right:auto;
+    margin-left:auto;
+}
+.about_us__name{
+    color: blue;
+    font-size: 20;
+    text-align: center;
+}
+.about_us__rol{
+    color: darkblue; 
+    font-size: 15;
+    text-align: center;
+}
+.about_us__img_footer{
+    height : 20px;
+    width: 20px;
+    display:block;
+    margin-right:auto;
+    margin-left:auto;
+}
+
+
+/* table */
+@media (max-width: 780px) {
+    .img_footer{
+        position: fixed;
+        display: none;
+    }
+}
+
+.content-page {
+    margin-left: 260px;
+    overflow: hidden;
+    padding: 70px 12px 65px;
+    min-height: 100vh;
+}
+
+
+/* #ch_care {
+    margin-left: 70px;
+    margin-right: 3rem;
+} */
+
+.label_selector{
+    font-size:1rem;/*0.8125rem;*/
+    font-weight: bold;
+    /*padding-top: 0rem;*/
+}
+
+.pink_bold{
+    color: #f8026a;
+    font-weight: bold;
+}
+
+.blue_bold{
+    color: #0288f8;
+    font-weight: bold;
+}
+
+.just_even_1{
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.just_even_2{
+    display: flex;
+    justify-content: space-around;
+ }
+
+ .just_center{
+    display: flex;
+    justify-content: center;
+ }
+
+ .jumbotron{
+    background-image: url("/assets/home/children-playing-grass.jpg"); /*happychildren.jpg*/   
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    color: white;
+    height: auto;
+ }
+
+.product_title{
+    background: rgba(80, 80, 80, 0.6) none repeat scroll 0% 0%;
+    display: inline-block;
+    padding: 5px;
+    text-shadow: black 1px 1px;
+}
+
+
+ .text_jumbotron{
+    background: rgba(80, 80, 80, 0.6) none repeat scroll 0% 0%;
+    display: inline-block;
+    padding: 5px;
+ }
+
+ .vertical-center {
+    min-height: 100%;
+    min-height: 100vh; 
+    display: flex;
+    align-items: center;
+  }
+
+.card-v{
+	color: #DD4095;
+}
+
+.hr_1{
+	borderWidth: 0.1vh;
+	width: 100%;
+	color: #DADADA;
+}
+
+  .homeFont {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    word-spacing: 2px;
+    color: #000000;
+    font-weight: 700;
+    text-decoration: none;
+    font-style: normal;
+    font-variant: normal;
+    text-transform: none;
+    }
+
+/* Buttons */
+
+.btn-info {
+    background-color: #21ddfb;
+    padding: 1rem 4rem;
+    border: 3px solid transparent;
+}
+
+.btn-info:hover {
+    background-color: #21ddfb;
+    border: 3px solid #21ddfb;
+    color: #21ddfb;
+}
+
+.btn-info:active {
+    background-color: transparent !important;
+    border: 3px solid #21ddfb !important;
+    color: #21ddfb !important;
+}
+
+.dashboard__margin__top{
+    margin-top: 1rem;
+}
