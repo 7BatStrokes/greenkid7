@@ -502,7 +502,6 @@ layout = dbc.Container([
 ], fluid=True)
 
 app.layout = html.Div([
-    dcc.Location(id='button_pred', refresh=False),
     html.Div([
         header,
         html.Div(id='page-content', children=layout, className='content')
